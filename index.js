@@ -1,9 +1,8 @@
-const { ApolloServer, gql } = require('apollo-server');
+// import axios from 'axios';
 
-const users = [
-    { id: '1', name: 'John Doe', email: 'john@test.com' },
-    { id: '2', name: 'Jane Doe', email: 'jane@example.com' },
-];
+const { ApolloServer, gql } = require('apollo-server');
+const { default: axios } = require('axios');
+
 
 const typeDefs = gql`
   type User {
@@ -22,10 +21,17 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     hello: (parent, args) => `Hello ${args.name}`,
-    users: () => users,
-    user: (parent, args) => {
-      const user = users.find((user) => user.id === args.id);
-      return user;
+    users: async () => {
+        const response = await axios.get(
+            'https://jsonplaceholder.typicode.com/users'
+        );
+        return response.data;
+    },
+    user: async (parent, args) => {
+        const response = await axios.get(
+            `https://jsonplaceholder.typicode.com/users/${args.id}`
+        );
+        return response.data;
     },
   },
 };
