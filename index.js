@@ -1,20 +1,27 @@
 const { ApolloServer, gql } = require('apollo-server');
 
+const users = [
+    { id: '1', name: 'John Doe', email: 'john@test.com' },
+    { id: '2', name: 'Jane Doe', email: 'jane@example.com' },
+];
+
 const typeDefs = gql`
-  type Query{
-    hello(name: String!): String,
-    body(contents: String!): String
+  type User {
+    id: ID!
+    name: String!
+    email: String!
   }
-`
+
+  type Query {
+    hello(name: String!): String
+    users: [User]
+  }
+`;
 
 const resolvers = {
     Query: {
         hello: (parent, args) => `Hello ${args.name}`,
-        body: (parent, args) => {
-            console.log('body parent', parent);
-            console.log('body args', args);
-            return 'return body';
-        },
+        users: () => users,
     },
 }
 
