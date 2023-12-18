@@ -11,10 +11,18 @@ const typeDefs = gql`
     email: String!
   }
 
+  type Post {
+    id: ID!
+    title: String!
+    body: String!
+    userId: ID!
+  }
+
   type Query {
     hello(name: String!): String
     users: [User]
     user(id: ID!): User
+    posts: [Post]
   }
 `;
 
@@ -33,6 +41,12 @@ const resolvers = {
         );
         return response.data;
     },
+    posts: async () => {
+        const response = await axios.get(
+            'https://jsonplaceholder.typicode.com/posts'
+        )
+        return response.data
+    }
   },
 };
 
