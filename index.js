@@ -2,6 +2,9 @@
 
 const { ApolloServer, gql } = require('apollo-server');
 const { default: axios } = require('axios');
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
 
 
 const typeDefs = gql`
@@ -24,6 +27,10 @@ const typeDefs = gql`
     user(id: ID!): User
     posts: [Post]
   }
+
+  type Mutation {
+    createUser(name: String!, email: String!): User
+  }
 `;
 
 const resolvers = {
@@ -35,24 +42,25 @@ const resolvers = {
         );
         return response.data;
     },
-    user: async (parent, args) => {
-        let response = await axios.get(
-          `https://jsonplaceholder.typicode.com/users/${args.id}`
-        );
-        let user = response.data;
-        response = await axios.get('https://jsonplaceholder.typicode.com/posts');
-        const myPosts = response.data.filter((post) => post.userId == args.id);
-        user = Object.assign({}, user, {
-          myPosts: myPosts,
-        });
-        return user;
+    users: () => {
+        return prisma.user.findMany();
     },
     posts: async () => {
         const response = await axios.get(
             'https://jsonplaceholder.typicode.com/posts'
         )
         return response.data
-    }
+    },
+    Mutation: {
+        createUser: (_, args) => {
+            return prisma.user.create({
+            data: {
+                name: args.name,
+                email: args.email,
+            },
+            });
+        },
+    },
   },
 };
 
