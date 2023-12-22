@@ -30,6 +30,8 @@ const typeDefs = gql`
 
   type Mutation {
     createUser(name: String!, email: String!): User
+    updateUser(id: Int!, name: String!): User
+    deleteUser(id: Int!): User
   }
 `;
 
@@ -53,12 +55,27 @@ const resolvers = {
     },
     Mutation: {
         createUser: (_, args) => {
-            return prisma.user.create({
+          return prisma.user.create({
             data: {
-                name: args.name,
-                email: args.email,
+              name: args.name,
+              email: args.email,
             },
-            });
+          });
+        },
+        updateUser: (_, args) => {
+          return prisma.user.update({
+            where: {
+              id: args.id,
+            },
+            data: {
+              name: 'John Doe',
+            },
+          });
+        },
+        deleteUser: (_, args) => {
+          return prisma.user.delete({
+            where: { id: args.id },
+          });
         },
     },
   },
